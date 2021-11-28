@@ -122,10 +122,10 @@ class Music(commands.Cog):
                 dt = '\n'.join(map(str, dates))
                 print(dt)
             #MAKE EMBEDS
-                embed = discord.Embed(title="GIGATRON", description="What is on sale", COLOR=discord.Color.from_rgb(193,69,69))
+                embed = discord.Embed(title="GIGATRON", description="What is on sale")
                 embed.add_field(name="NAME", value=pr)
                 embed.add_field(name="DATE", value=dt)
-                # embed.set_thumbnail(url = 'https://img.gigatron.rs/assets/img/sidebarlogo.png')
+                embed.set_thumbnail(url = 'https://raw.githubusercontent.com/vukilis/XanaDiscordBot/main/gigatron.png')
                 await ctx.channel.send(embed=embed)
 
         except urllib.request.HTTPError as e:
