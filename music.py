@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import urllib.request
-import time
+import time, json
 
 # def get_voice_state(self, ctx: commands.Context):
     #     state = self.voice_states.get(ctx.guild.id)
@@ -32,6 +32,8 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             await ctx.channel.send("🎶 Hello Friend, lets music! 🎶")
             await voice_channel.connect()
+        if Music.play(self, ctx):
+            await ctx.voice_client.move_to(voice_channel)
         else:
             await ctx.channel.send("You moved me to another voice channel! ☑️")
             await ctx.voice_client.move_to(voice_channel)
@@ -45,11 +47,12 @@ class Music(commands.Cog):
     @commands.command()
     async def play(self, ctx, url):
         """!play | Play the music"""
+        await ctx.channel.purge(limit=1)
+        await Music.join(self,ctx)
         ctx.voice_client.stop()
-        # voice_channel = ctx.author.voice.channel
-        # if ctx.voice_client is None:
-        #     await ctx.channel.send("🎶 Hello Friend, lets music! 🎶")
-        #     await voice_channel.connect()
+        voice_channel = ctx.author.voice.channel
+        voice_ch = get(self.bot.voice_clients, guild=ctx.guild)
+
         YDL_OPTIONS = {
             'format': 'bestaudio/best',
             'extractaudio': True,
@@ -69,20 +72,21 @@ class Music(commands.Cog):
         }
         voice_ch = ctx.voice_client
         with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(url, download=False)
-            url2 = info['formats'][0]['url']
-            voice_ch.play(discord.FFmpegPCMAudio(executable="V:/Program Files (x86)/JDownloader/tools/Windows/ffmpeg/x64/ffmpeg.exe", source=url2, **FFMPEG_OPTIONS))
-            # source = await discord.FFmpegOpusAudio.from_probe(url2, **FFMPEG_OPTIONS)
-            # voice_ch.play(source)
-            if 'entries' in info:
-                video = info['entries'][0]       
-            else:
-                video = info
-            print(YDL_OPTIONS['outtmpl'])
-            print ("{0}".format((info['title'])))
-            await ctx.channel.send("🔹" + "{0}".format((info['title'])) + " ▶️")
-            # print(video)
-            video_url = video['url']
+            if voice_channel and not voice_ch.is_playing():
+                info = ydl.extract_info(url, download=False)
+                url2 = info['formats'][0]['url']
+                voice_ch.play(discord.FFmpegPCMAudio(executable="V:/Program Files (x86)/JDownloader/tools/Windows/ffmpeg/x64/ffmpeg.exe", source=url2, **FFMPEG_OPTIONS))
+                # source = await discord.FFmpegOpusAudio.from_probe(url2, **FFMPEG_OPTIONS)
+                # voice_ch.play(source)
+                if 'entries' in info:
+                    video = info['entries'][0]       
+                else:
+                    video = info
+                print(YDL_OPTIONS['outtmpl'])
+                print ("{0}".format((info['title'])))
+                await ctx.channel.send("🔹" + "{0}".format((info['title'])) + " ▶️")
+                # print(video)
+                video_url = video['url']
         
     @commands.command()
     async def pause(self, ctx):
@@ -96,6 +100,16 @@ class Music(commands.Cog):
         await ctx.channel.send("Resume ▶️")
         await ctx.voice_client.resume() 
 
+#EPIC API CALL --> content -->not finish!!
+    @commands.command(name='epic_status')
+    async def epic_status(self ,ctx):
+        """!epic_status | Show epic status"""
+        
+        url = "https://status.epicgames.com/api/v2/status.json"
+        session = requests.Session()
+        response = session.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+        data = json.loads(response.text)
+    
     @commands.command(name='gigatron')
     async def gigatron(self ,ctx):
         """!gigatron | Show gigatron sales"""
@@ -136,6 +150,7 @@ class Music(commands.Cog):
                 ## can add authentication here 
             else:
                 print('http error',e)
+
 #####get channel stats
     @commands.command(name='channel_stats', aliases=['stats', 'chstats'])
     async def channel_stats(self ,ctx):
@@ -148,14 +163,10 @@ class Music(commands.Cog):
         
         await ctx.channel.send(embed=embed)
 
-    # @commands.command()
-    # async def new(self, ctx):
-    #     await ctx.send("Ivalid")
-
 #####make new channel category
     @commands.command(name='category')
     async def category(self ,ctx, role: discord.Role, *, name):
-        """!categorty <role> <name> | Create channel category"""
+        """!category <role> <name> | Create channel category"""
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.guild.me: discord.PermissionOverwrite(read_messages=True),
@@ -167,7 +178,7 @@ class Music(commands.Cog):
 #####make new text channel
     @commands.command(name='channel')
     async def channel(self ,ctx, role: discord.Role, *, name):
-        """!categorty <role> <name> | Create text channel"""
+        """!channel <role> <name> | Create text channel"""
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.guild.me: discord.PermissionOverwrite(read_messages=True),
