@@ -41,11 +41,20 @@ for i in range(len(cogs)):
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
-    channel_id_server = [913805324966830130, 913861842235953182]
+    channel_id_server = [913805324966830130]
     for i in channel_id_server:
         await client.get_channel(i).send('Xana is awake, say \"!hello\" to Xana')
     DiscordComponents(client)
 
+# @client.event
+# async def on_voice_state_update(member, before, after):
+#     voice_state = member.guild.voice_client
+#     if voice_state is None:
+#         # Exiting if the bot it's not connected to a voice channel
+#         return 
+
+#     if len(voice_state.channel.members) == 1:
+#         await voice_state.disconnect()
 @client.event
 async def on_message(message):
     username = message.author.display_name
@@ -55,7 +64,18 @@ async def on_message(message):
     
         await message.channel.send('Hello ' +username+ ', my name is Xana. \nFor commands type !help')
     await client.process_commands(message)
-    
+
+###Bot leave channel if empty###
+@client.event
+async def on_voice_state_update(member, before, after):
+    voice_state = member.guild.voice_client
+    channel1 = client.get_channel(913805324966830130)
+    if voice_state is None:
+        return 
+    if len(voice_state.channel.members) == 1:
+        await channel1.send("Goodbye! 👋 ⏏️")
+        await voice_state.disconnect()
+
 #NE RADIIII!!!!!!!!!!!!!
 # @client.command()      
 # async def winwin(ctx):

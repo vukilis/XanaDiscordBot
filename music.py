@@ -43,12 +43,33 @@ class Music(commands.Cog):
         """!dc | Disconnect from voice"""
         await ctx.channel.send("Goodbye! 👋 ⏏️")
         await ctx.voice_client.disconnect()
-
+        
+###Bot leave channel if inactive 5 min###
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after): 
+        if not member.id == self.bot.user.id:
+            return
+        elif before.channel is None:
+            voice = after.channel.guild.voice_client
+            time = 0
+            while True:
+                await asyncio.sleep(1)
+                time = time + 1
+                if voice.is_playing() and not voice.is_paused():
+                    time = 0
+                if time == 300:
+                    await voice.disconnect()
+                if voice.is_playing() == False and time == 300:
+                    await voice.disconnect()
+                    break
+                if not voice.is_connected():
+                    break
+    
     @commands.command()
     async def play(self, ctx, url):
         """!play | Play the music"""
         await ctx.channel.purge(limit=1)
-        await Music.join(self,ctx)
+        await Music.join(self, ctx)
         ctx.voice_client.stop()
         voice_channel = ctx.author.voice.channel
         voice_ch = get(self.bot.voice_clients, guild=ctx.guild)
@@ -91,14 +112,16 @@ class Music(commands.Cog):
     @commands.command()
     async def pause(self, ctx):
         """!pause | Pause the music"""
+        await ctx.channel.purge(limit=1)
         await ctx.channel.send("Paused ⏸️")
-        await ctx.voice_client.pause()
+        ctx.voice_client.pause()
         
     @commands.command()
     async def resume(self, ctx):
         """!pause | Resume the music"""
+        await ctx.channel.purge(limit=1)
         await ctx.channel.send("Resume ▶️")
-        await ctx.voice_client.resume() 
+        ctx.voice_client.resume() 
 
 #EPIC API CALL --> content -->not finish!!
     @commands.command(name='epic_status')
