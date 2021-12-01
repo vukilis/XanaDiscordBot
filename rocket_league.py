@@ -13,7 +13,6 @@ class RL(commands.Cog):
     @commands.command(name='epic')
     async def epic(self, ctx):
         """!epic | Show epic server status"""
-        await ctx.channel.purge(limit=1)
         try:
             url = "https://status.epicgames.com/api/v2/status.json"
             session = requests.Session()
@@ -25,7 +24,7 @@ class RL(commands.Cog):
             # pprint.pprint(status)
             
             #MAKE EMBEDS
-            embed = discord.Embed(title="EPIC STATUS", description=f'`{name}`')
+            embed = discord.Embed(title="EPIC STATUS", description=f'`{name}`', color = discord.Color.from_rgb(102, 204, 0))
             embed.add_field(name="Mode:", value=status)   
             embed.set_thumbnail(url = 'https://raw.githubusercontent.com/vukilis/XanaDiscordBot/main/epic.png')
             await ctx.channel.purge(limit=1)
@@ -37,6 +36,7 @@ class RL(commands.Cog):
                 print(f'{url} base webservices are not available')
             else:
                 print('http error',e)
+                
     @commands.command(name='rocket_league', aliases=['rl'])
     async def rocket_league(self, ctx, platform, username):
         """!rl <platform> <ign> | Show rocket league stats"""
@@ -47,36 +47,41 @@ class RL(commands.Cog):
             session = requests.Session()
             response = session.get(url, headers={'User-Agent': 'Mozilla/5.0'})
             soup = BeautifulSoup(response.content,'html5lib')
-            data = json.loads(soup.text) 
+            data = json.loads(soup.text)
             # pprint.pprint(data)
             
-            duo_name =  data['data'][0]['metadata']['name']
-            duo_rank_name = data['data'][0]['stats']['tier']['metadata']['name']
-            duo_rank = data['data'][0]['stats']['division']['metadata']['name']
-            duo_matches = data['data'][0]['stats']['matchesPlayed']['displayValue']
-            duo_rating = data['data'][0]['stats']['rating']['displayValue']
-            duo_tier = data['data'][0]['stats']['tier']['metadata']['iconUrl']
-            duo_streak = data['data'][0]['stats']['winStreak']['displayValue']
+            duo_name =  data['data'][1]['metadata']['name']
+            duo_rank_name = data['data'][1]['stats']['tier']['metadata']['name']
+            duo_rank = data['data'][1]['stats']['division']['metadata']['name']
+            duo_matches = data['data'][1]['stats']['matchesPlayed']['displayValue']
+            duo_rating = data['data'][1]['stats']['rating']['displayValue']
+            duo_tier = data['data'][1]['stats']['tier']['metadata']['iconUrl']
+            duo_streak = data['data'][1]['stats']['winStreak']['displayValue']
+            # duo_percentile = data['data'][1]['stats']['rating']['percentile']
+            
+            doubles_name = data['data'][2]['metadata']['name']
+            doubles_rank_name = data['data'][2]['stats']['tier']['metadata']['name']
+            doubles_rank = data['data'][2]['stats']['division']['metadata']['name']
+            doubles_matches = data['data'][2]['stats']['matchesPlayed']['displayValue']
+            doubles_rating = data['data'][2]['stats']['rating']['displayValue']
+            doubles_tier = data['data'][2]['stats']['tier']['metadata']['iconUrl']
+            doubles_streak = data['data'][2]['stats']['winStreak']['displayValue']
+            # doubles_percentile = data['data'][2]['stats']['rating']['percentile']
 
-            doubles_name = data['data'][1]['metadata']['name']
-            doubles_rank_name = data['data'][1]['stats']['tier']['metadata']['name']
-            doubles_rank = data['data'][1]['stats']['division']['metadata']['name']
-            doubles_matches = data['data'][1]['stats']['matchesPlayed']['displayValue']
-            doubles_rating = data['data'][1]['stats']['rating']['displayValue']
-            doubles_tier = data['data'][1]['stats']['tier']['metadata']['iconUrl']
-            doubles_streak = data['data'][1]['stats']['winStreak']['displayValue']
+            standard_name = 'Mode ' + data['data'][3]['metadata']['name']
+            standard_rank_name = data['data'][3]['stats']['tier']['metadata']['name']
+            standard_rank = data['data'][3]['stats']['division']['metadata']['name']
+            standard_matches = data['data'][3]['stats']['matchesPlayed']['displayValue']
+            standard_rating = data['data'][3]['stats']['rating']['displayValue']
+            standard_tier = data['data'][3]['stats']['tier']['metadata']['iconUrl']
+            standard_streak=  data['data'][3]['stats']['winStreak']['displayValue']
+            # standard_percentile = data['data']['segments'][1]['stats']['rating']['percentile']
+            # print(str(standard_percentile))
 
-            standard_name = 'Mode ' + data['data'][2]['metadata']['name']
-            standard_rank_name = data['data'][2]['stats']['tier']['metadata']['name']
-            standard_rank = data['data'][2]['stats']['division']['metadata']['name']
-            standard_matches = data['data'][2]['stats']['matchesPlayed']['displayValue']
-            standard_rating = data['data'][2]['stats']['rating']['displayValue']
-            standard_tier = data['data'][2]['stats']['tier']['metadata']['iconUrl']
-            standard_streak=  data['data'][2]['stats']['winStreak']['displayValue']
 
-            accounts = [duo_name, duo_rank_name, duo_rank, duo_matches, duo_rating, duo_tier, duo_streak,
-                doubles_name, doubles_rank_name, doubles_rank, doubles_matches, doubles_rating, doubles_tier, doubles_streak,
-                standard_name, standard_rank_name, standard_rank, standard_matches, standard_rating, standard_tier, standard_streak]
+            # accounts = [duo_name, duo_rank_name, duo_rank, duo_matches, duo_rating, duo_tier, duo_streak,
+            #     doubles_name, doubles_rank_name, doubles_rank, doubles_matches, doubles_rating, doubles_tier, doubles_streak,
+            #     standard_name, standard_rank_name, standard_rank, standard_matches, standard_rating, standard_tier, standard_streak]
             
             # for i in accounts: print(i)
             
@@ -84,39 +89,42 @@ class RL(commands.Cog):
             session2 = requests.Session()
             response2 = session2.get(url2, headers={'User-Agent': 'Mozilla/5.0'})
             soup2 = BeautifulSoup(response2.content,'html5lib')
-            data = json.loads(soup2.text) 
-            # pprint.pprint(data)
-            platform_name = data['data']['platformInfo']['platformSlug']
-            name = data['data']['platformInfo']['platformUserHandle']
-            seasson_reward = data['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['iconUrl']
+            data2 = json.loads(soup2.text) 
+            # pprint.pprint(data2)
+            platform_name = data2['data']['platformInfo']['platformSlug']
+            name = data2['data']['platformInfo']['platformUserHandle']
+            seasson_reward = data2['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['iconUrl']
+            seasson_till_reward = data2['data']['segments'][0]['stats']['seasonRewardWins']['displayValue']
+            
+            duo_percentile = str(int(data2['data']['segments'][1]['stats']['rating']['percentile'])) + '%'
+            doubles_percentile = str(int(data2['data']['segments'][2]['stats']['rating']['percentile'])) + '%'
+            standard_percentile = str(int(data2['data']['segments'][3]['stats']['rating']['percentile'])) + '%'
+
         #MAKE EMBEDS
-            embed = discord.Embed(title="RL-STATS", description=f'`{name}`')
+            embed = discord.Embed(title="RL-STATS", description=f'`{name}` `Season Reward Wins: {seasson_till_reward}/10`', color = discord.Color.from_rgb(0, 128, 255))
             embed.add_field(name="Mode:", value=standard_name)
             embed.add_field(name="Rank:", value=standard_rank_name)
-            embed.add_field(name="Divisin:", value=standard_rank)
+            embed.add_field(name="Division:", value=standard_rank + " - Elo: " +standard_rating )
+            embed.add_field(name="Better than:", value=standard_percentile + " of players")
+            embed.add_field(name="Matches:", value=standard_matches)
+            embed.add_field(name="Streak:", value=standard_streak)
             
             embed.add_field(name="Mode:", value=doubles_name)
             embed.add_field(name="Rank:", value=doubles_rank_name)
-            embed.add_field(name="Divisin:", value=doubles_rank)
+            embed.add_field(name="Division:", value=doubles_rank + " - Elo: " +doubles_rating )
+            embed.add_field(name="Better than:", value=doubles_percentile + "  of players")
+            embed.add_field(name="Matches:", value=doubles_matches)
+            embed.add_field(name="Streak:", value=doubles_streak)
             
             embed.add_field(name="Mode:", value=duo_name)
             embed.add_field(name="Rank:", value=duo_rank_name)
-            embed.add_field(name="Divisin:", value=duo_rank)
-            
-            embed.add_field(name="Elo 3v3:", value=standard_rating)
-            embed.add_field(name="Elo 2v2:", value=doubles_rating)
-            embed.add_field(name="Elo 1v1:", value=duo_rating)
-            
-            embed.add_field(name="Matches 3v3:", value=standard_matches)
-            embed.add_field(name="Matches 2v2:", value=doubles_matches)
-            embed.add_field(name="Matches 1v1:", value=duo_matches)
-            
-            embed.add_field(name="Streak 3v3:", value=standard_streak)
-            embed.add_field(name="Streak 2v2:", value=doubles_streak)
-            embed.add_field(name="Streak 1v1:", value=duo_streak)
+            embed.add_field(name="Division:", value=duo_rank + " - Elo: " +duo_rating )
+            embed.add_field(name="Better than:", value=duo_percentile + "  of players")
+            embed.add_field(name="Matches:", value=duo_matches)
+            embed.add_field(name="Streak:", value=duo_streak)
             
             embed.set_thumbnail(url = seasson_reward)
-            await ctx.channel.purge(limit=1)
+            # await ctx.channel.purge(limit=3)
             await ctx.channel.send(embed=embed)
         
         except urllib.request.HTTPError as e:

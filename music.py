@@ -159,7 +159,7 @@ class Music(commands.Cog):
                 dt = '\n'.join(map(str, dates))
                 print(dt)
             #MAKE EMBEDS
-                embed = discord.Embed(title="GIGATRON", description="What is on sale")
+                embed = discord.Embed(title="GIGATRON", description="What is on sale", color = discord.Color.from_rgb(255, 255, 0))
                 embed.add_field(name="NAME", value=pr)
                 embed.add_field(name="DATE", value=dt)
                 embed.set_thumbnail(url = 'https://raw.githubusercontent.com/vukilis/XanaDiscordBot/main/gigatron.png')
