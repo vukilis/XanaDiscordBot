@@ -3,7 +3,7 @@ import discord
 from discord import message
 from dotenv import load_dotenv
 from discord.ext import commands
-import music, requests
+import music, requests, rocket_league
 from discord.utils import get
 from discord_components import *
 from bs4 import BeautifulSoup
@@ -29,11 +29,12 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 #     async def send_command_help(self, command):
 #         await self.get_destination().send(command.name)
 
-cogs = [music]
+cogs = [music, rocket_league]
 client = commands.Bot(command_prefix='!', intents = discord.Intents.all())
 
 for i in range(len(cogs)):
     cogs[i].setup(client)
+
 
 # user = bot.get_user(user_id)
 # username = client.get_user(user_id)
@@ -46,25 +47,15 @@ async def on_ready():
         await client.get_channel(i).send('Xana is awake, say \"!hello\" to Xana')
     DiscordComponents(client)
 
-# @client.event
-# async def on_voice_state_update(member, before, after):
-#     voice_state = member.guild.voice_client
-#     if voice_state is None:
-#         # Exiting if the bot it's not connected to a voice channel
-#         return 
-
-#     if len(voice_state.channel.members) == 1:
-#         await voice_state.disconnect()
 @client.event
 async def on_message(message):
     username = message.author.display_name
     if message.author == client.user:
         return 
     if message.content.startswith('!hello'):
-    
         await message.channel.send('Hello ' +username+ ', my name is Xana. \nFor commands type !help')
     await client.process_commands(message)
-
+    
 ###Bot leave channel if empty###
 @client.event
 async def on_voice_state_update(member, before, after):
