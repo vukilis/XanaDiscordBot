@@ -122,16 +122,6 @@ class Music(commands.Cog):
         await ctx.channel.purge(limit=1)
         await ctx.channel.send("Resume ▶️")
         ctx.voice_client.resume() 
-
-#EPIC API CALL --> content -->not finish!!
-    @commands.command(name='epic_status')
-    async def epic_status(self ,ctx):
-        """!epic_status | Show epic status"""
-        
-        url = "https://status.epicgames.com/api/v2/status.json"
-        session = requests.Session()
-        response = session.get(url, headers={'User-Agent': 'Mozilla/5.0'})
-        data = json.loads(response.text)
     
     @commands.command(name='gigatron')
     async def gigatron(self ,ctx):
@@ -188,6 +178,7 @@ class Music(commands.Cog):
 
 #####make new channel category
     @commands.command(name='category')
+    @commands.is_owner()
     async def category(self ,ctx, role: discord.Role, *, name):
         """!category <role> <name> | Create channel category"""
         overwrites = {
@@ -200,6 +191,7 @@ class Music(commands.Cog):
     
 #####make new text channel
     @commands.command(name='channel')
+    @commands.is_owner()
     async def channel(self ,ctx, role: discord.Role, *, name):
         """!channel <role> <name> | Create text channel"""
         overwrites = {
@@ -209,6 +201,12 @@ class Music(commands.Cog):
         }
         channel = await ctx.guild.create_text_channel(name=name, overwrites=overwrites)
         await ctx.send(f"Hey friend, I made {channel.name} for you!")
+    
+    @commands.command(name='Invite link', aliases=['inv'])
+    async def create_invite(self, ctx):
+        """Create instant invite"""
+        link = await ctx.channel.create_invite(max_age = 300)
+        await ctx.send(link)
 
 
 def setup(client):
