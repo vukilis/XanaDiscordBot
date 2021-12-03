@@ -12,6 +12,8 @@ from twitchAPI.twitch import Twitch
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+client_id_twitch = os.getenv('client_id_twitch')
+client_secret_twitch = os.getenv('client_secret_twitch')
 
 
 # class CustomHelpCommand(commands.HelpCommand):
@@ -38,10 +40,7 @@ for i in range(len(cogs)):
     cogs[i].setup(client)
 
 client.launch_time = datetime.utcnow()
-
-client_id = "esqad4hvimofbdrykhn3g5fs8y5vlx"
-client_secret = "8drhvzxd6w4ihmw1wcna6wqlf9p3mc"
-twitch = Twitch(client_id, client_secret)
+twitch = Twitch(client_id_twitch, client_secret_twitch)
 twitch.authenticate_app([])
 TWITCH_STREAM_API_ENDPOINT_V5 = "https://api.twitch.tv/kraken/streams/{}"
 API_HEADERS = {
