@@ -27,21 +27,25 @@ class Music(commands.Cog):
     async def join(self, ctx):
         """!join | Join to voice"""
         if ctx.author.voice is None:
-            await ctx.channel.send("⚠️ Please join in a voice channel! ⚠️")
+            e = discord.Embed(title="⚠️ Please join in a voice channel! ⚠️", color=discord.Color.green())
+            await ctx.send(embed=e)
         voice_channel = ctx.author.voice.channel
         if ctx.voice_client is None:
-            await ctx.channel.send("🎶 Hello Friend, lets music! 🎶")
+            e = discord.Embed(title="🎶 Hello Friend, lets music! 🎶", color=discord.Color.green())
+            await ctx.send(embed=e)
             await voice_channel.connect()
         if Music.play(self, ctx):
             await ctx.voice_client.move_to(voice_channel)
         else:
-            await ctx.channel.send("You moved me to another voice channel! ☑️")
+            e = discord.Embed(title="You moved me to another voice channel! ☑️", color=discord.Color.green())
+            await ctx.send(embed=e)
             await ctx.voice_client.move_to(voice_channel)
     
     @commands.command(name='disconnect', aliases=['dc', 'stop'])
     async def disconnect(self, ctx):
         """!dc | Disconnect from voice"""
-        await ctx.channel.send("Goodbye! 👋 ⏏️")
+        e = discord.Embed(title="Goodbye! 👋 ⏏️", color=discord.Color.red())
+        await ctx.send(embed=e)
         await ctx.voice_client.disconnect()
         
 ###Bot leave channel if inactive 5 min###
@@ -98,30 +102,30 @@ class Music(commands.Cog):
                 info = ydl.extract_info(url, download=False)
                 url2 = info['formats'][0]['url']
                 voice_ch.play(discord.FFmpegPCMAudio(executable="V:/Program Files (x86)/JDownloader/tools/Windows/ffmpeg/x64/ffmpeg.exe", source=url2, **FFMPEG_OPTIONS))
-                # source = await discord.FFmpegOpusAudio.from_probe(url2, **FFMPEG_OPTIONS)
-                # voice_ch.play(source)
                 if 'entries' in info:
                     video = info['entries'][0]       
                 else:
                     video = info
                 print(YDL_OPTIONS['outtmpl'])
                 print ("{0}".format((info['title'])))
-                await ctx.channel.send("🔹" + "{0}".format((info['title'])) + " ▶️")
-                # print(video)
+                e = discord.Embed(title="🔹" + "{0}".format((info['title'])) + " ▶️", color=discord.Color.green())
+                await ctx.send(embed=e)
                 video_url = video['url']
         
     @commands.command()
     async def pause(self, ctx):
         """!pause | Pause the music"""
         await ctx.channel.purge(limit=1)
-        await ctx.channel.send("Paused ⏸️")
+        e = discord.Embed(title="Paused ⏸️", color=discord.Color.dark_purple())
+        await ctx.send(embed=e)
         ctx.voice_client.pause()
         
     @commands.command()
     async def resume(self, ctx):
         """!pause | Resume the music"""
         await ctx.channel.purge(limit=1)
-        await ctx.channel.send("Resume ▶️")
+        e = discord.Embed(title="Resume ▶️", color=discord.Color.dark_purple())
+        await ctx.send(embed=e)
         ctx.voice_client.resume() 
     
     @commands.command(name='gigatron')
@@ -170,7 +174,7 @@ class Music(commands.Cog):
     async def channel_stats(self ,ctx):
         """!stats | Show channel stats"""
         channel = ctx.channel
-        embed = discord.Embed(title=f"Stats for **{channel.name}**", description=f"{'Category: {}'.format(channel.category.name) if channel.category else 'This channel is not in a category'}")
+        embed = discord.Embed(title=f"Stats for **{channel.name}**", description=f"{'Category: {}'.format(channel.category.name) if channel.category else 'This channel is not in a category'}", color=discord.Color.green())
         embed.add_field(name="Channel Guild", value=ctx.guild.name, inline=False)
         embed.add_field(name="Channel id", value=channel.id, inline=False)
         embed.add_field(name="Channel Creaion Time", value=channel.created_at, inline=False)
@@ -188,7 +192,10 @@ class Music(commands.Cog):
             role: discord.PermissionOverwrite(read_messages=True)
         }
         category = await ctx.guild.create_category(name=name, overwrites=overwrites)
-        await ctx.send(f"Hey friend, I made {category.name} for you!")
+        
+        e = discord.Embed(title=f"Hey friend, I made {category.name} for you!", color=discord.Color.dark_purple())
+        await ctx.send(embed=e)
+        # await ctx.send(f"Hey friend, I made {category.name} for you!")
     
 #####make new text channel
     @commands.command(name='channel')
@@ -201,7 +208,9 @@ class Music(commands.Cog):
             role: discord.PermissionOverwrite(read_messages=True)
         }
         channel = await ctx.guild.create_text_channel(name=name, overwrites=overwrites)
-        await ctx.send(f"Hey friend, I made {channel.name} for you!")
+        e = discord.Embed(title=f"Hey friend, I made {channel.name} for you!", color=discord.Color.dark_purple())
+        await ctx.send(embed=e)
+        # await ctx.send(f"Hey friend, I made {channel.name} for you!")
     
     @commands.command(name='Invite link', aliases=['inv'])
     async def create_invite(self, ctx):
