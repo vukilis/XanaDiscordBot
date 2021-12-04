@@ -23,7 +23,7 @@ for i in range(len(cogs)):
 async def on_ready(*args, **kwargs):
     change_status.start()
     print(f'{client.user} has connected to Discord!')
-    channel_id_server = [913805324966830130]
+    channel_id_server = [913861842235953182]
     # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
     for i in channel_id_server:
         await client.get_channel(i).send('Xana is awake, say \"!hello\" to Xana')

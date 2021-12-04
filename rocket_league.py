@@ -75,15 +75,7 @@ class RL(commands.Cog):
             standard_rating = data['data'][3]['stats']['rating']['displayValue']
             standard_tier = data['data'][3]['stats']['tier']['metadata']['iconUrl']
             standard_streak=  data['data'][3]['stats']['winStreak']['displayValue']
-            # standard_percentile = data['data']['segments'][1]['stats']['rating']['percentile']
-            # print(str(standard_percentile))
 
-
-            # accounts = [duo_name, duo_rank_name, duo_rank, duo_matches, duo_rating, duo_tier, duo_streak,
-            #     doubles_name, doubles_rank_name, doubles_rank, doubles_matches, doubles_rating, doubles_tier, doubles_streak,
-            #     standard_name, standard_rank_name, standard_rank, standard_matches, standard_rating, standard_tier, standard_streak]
-            
-            # for i in accounts: print(i)
             
             url2 = "https://api.tracker.gg/api/v2/rocket-league/standard/profile/"+platform+"/"+username
             session2 = requests.Session()

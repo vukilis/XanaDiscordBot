@@ -122,7 +122,7 @@ class Music(commands.Cog):
         
     @commands.command()
     async def resume(self, ctx):
-        """!pause | Resume the music"""
+        """!resume | Resume the music"""
         await ctx.channel.purge(limit=1)
         e = discord.Embed(title="Resume ▶️", color=discord.Color.dark_purple())
         await ctx.send(embed=e)
@@ -214,7 +214,7 @@ class Music(commands.Cog):
     
     @commands.command(name='Invite link', aliases=['inv'])
     async def create_invite(self, ctx):
-        """Create instant invite"""
+        """!inv | Create instant invite"""
         link = await ctx.channel.create_invite(max_age = 300)
         await ctx.send(link)
 
