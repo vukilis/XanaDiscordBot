@@ -15,6 +15,7 @@ my_secret = os.environ['DISCORD_TOKEN']
 
 cogs = [music, rocket_league, steam]
 client = commands.Bot(command_prefix='!', owner_id = 269115882251223052, intents = discord.Intents.all())
+client.launch_time = datetime.utcnow()
 
 for i in range(len(cogs)):
     cogs[i].setup(client)
