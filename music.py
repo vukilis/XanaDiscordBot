@@ -73,6 +73,7 @@ class Music(commands.Cog):
         ctx.voice_client.stop()
         voice_channel = ctx.author.voice.channel
         voice_ch = get(self.bot.voice_clients, guild=ctx.guild)
+        await ctx.guild.change_voice_state(channel=voice_channel, self_mute=False, self_deaf=True)
 
         YDL_OPTIONS = {
             'format': 'bestaudio/best',

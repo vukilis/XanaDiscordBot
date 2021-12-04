@@ -22,8 +22,8 @@ class CSGO(commands.Cog):
             url = 'https://public-api.tracker.gg/v2/csgo/standard/profile/steam/'+username
             session = requests.Session()
             response = session.get(url, headers={'TRN-Api-Key':TOKEN,'User-Agent': 'Mozilla/5.0', 'Content-Type' : 'application/json'})
-            data = json.load(response.text) 
-            pprint.pprint(data)
+            data = json.loads(response.text) 
+            # pprint.pprint(data)
             player_name =  data['data']['platformInfo']['platformUserHandle']
             steamID = data['data']['platformInfo']['platformUserId']
             avatar = data['data']['platformInfo']['avatarUrl']

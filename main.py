@@ -2,18 +2,15 @@ import os, json
 import discord
 from discord import message
 from dotenv import load_dotenv
-from discord.ext import tasks, commands
+from discord.ext import commands
 import music, requests, rocket_league, steam
 from discord.utils import get
 from discord_components import *
 from bs4 import BeautifulSoup
 from datetime import datetime
-from twitchAPI.twitch import Twitch
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-client_id_twitch = os.getenv('client_id_twitch')
-client_secret_twitch = os.getenv('client_secret_twitch')
 
 
 # class CustomHelpCommand(commands.HelpCommand):
@@ -39,35 +36,6 @@ client = commands.Bot(command_prefix='!', owner_id = 269115882251223052, intents
 for i in range(len(cogs)):
     cogs[i].setup(client)
 
-client.launch_time = datetime.utcnow()
-twitch = Twitch(client_id_twitch, client_secret_twitch)
-twitch.authenticate_app([])
-TWITCH_STREAM_API_ENDPOINT_V5 = "https://api.twitch.tv/kraken/streams/{}"
-API_HEADERS = {
-    'Client-ID': client_id,
-    'Accept': 'application/vnd.twitchtv.v5+json',
-}
-
-
-# Returns true if online, false if not.
-def checkuser(user):
-    try:
-        userid = twitch.get_users(logins=[user])['data'][0]['id']
-        url = TWITCH_STREAM_API_ENDPOINT_V5.format(userid)
-        try:
-            req = requests.Session().get(url, headers=API_HEADERS)
-            jsondata = req.json()
-            if 'stream' in jsondata:
-                if jsondata['stream'] is not None:
-                    return True
-                else:
-                    return False
-        except Exception as e:
-            print("Error checking user: ", e)
-            return False
-    except IndexError:
-        return False
-
 @client.event
 async def on_ready(*args, **kwargs):
     print(f'{client.user} has connected to Discord!')
@@ -76,50 +44,6 @@ async def on_ready(*args, **kwargs):
     for i in channel_id_server:
         await client.get_channel(i).send('Xana is awake, say \"!hello\" to Xana')
     DiscordComponents(client)
-    @tasks.loop(seconds=10)
-    async def live_notifs_loop():
-        with open('twitch.json', 'r') as file:
-            streamers = json.loads(file.read())
-        if streamers is not None:
-            guild = client.get_guild(768871813936840774)
-            channel = client.get_channel(913805324966830130)
-            role = get(guild.roles, id=916150239633747999)
-            for user_id, twitch_name in streamers.items():
-                status = checkuser(twitch_name)
-                user = client.get_user(int(user_id))
-                if status is True:
-                    async for message in channel.history(limit=200):
-                        if str(user.mention) in message.content and "is now streaming" in message.content:
-                            break
-                        else:
-                            async for member in guild.fetch_members(limit=None):
-                                if member.id == int(user_id):
-                                    await member.add_roles(role)
-                            await channel.send(
-                                f":red_circle: **LIVE**\n{user.mention} is now streaming on Twitch!"
-                                f"\nhttps://www.twitch.tv/{twitch_name}")
-                            print(f"{user} started streaming. Sending a notification.")
-                            break
-                else:
-                    async for member in guild.fetch_members(limit=None):
-                        if member.id == int(user_id):
-                            await member.remove_roles(role)
-                    async for message in channel.history(limit=200):
-                        if str(user.mention) in message.content and "is now streaming" in message.content:
-                            await message.delete()
-    # Start your loop.
-    live_notifs_loop.start()
-
-@client.command(name='addtwitch', help='Adds your Twitch to the live notifs.', pass_context=True)
-async def add_twitch(ctx, twitch_name):
-    with open('twitch.json', 'r') as file:
-        streamers = json.loads(file.read())
-    user_id = ctx.author.id
-    streamers[user_id] = twitch_name
-    
-    with open('twitch.json', 'w') as file:
-        file.write(json.dumps(streamers))
-    await ctx.send(f"Added {twitch_name} for {ctx.author} to the notifications list.")
 
 @client.event
 async def on_message(message):
@@ -198,6 +122,7 @@ async def uptime(ctx):
 
 @client.command()
 async def ping(ctx):
+    """!ping | Show User Latency"""
     e = discord.Embed(title=f"Latency: {round(client.latency*1000)}ms", color=discord.Color.green())
     await ctx.send(embed=e)
 
