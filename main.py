@@ -1,15 +1,17 @@
 import os, json
 import discord
 from discord import message
-from dotenv import load_dotenv
-from discord.ext import commands
+# from dotenv import load_dotenv
+from discord.ext import commands, tasks
 import music, rocket_league, steam
 from discord.utils import get
 from discord_components import *
 from datetime import datetime
+import keep_alive
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+# load_dotenv()
+# TOKEN = os.getenv('DISCORD_TOKEN')
+my_secret = os.environ['DISCORD_TOKEN']
 
 cogs = [music, rocket_league, steam]
 client = commands.Bot(command_prefix='!', owner_id = 269115882251223052, intents = discord.Intents.all())
@@ -19,12 +21,17 @@ for i in range(len(cogs)):
 
 @client.event
 async def on_ready(*args, **kwargs):
+    change_status.start()
     print(f'{client.user} has connected to Discord!')
-    channel_id_server = [913861842235953182]
-    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
+    channel_id_server = [913805324966830130]
+    # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
     for i in channel_id_server:
         await client.get_channel(i).send('Xana is awake, say \"!hello\" to Xana')
-    DiscordComponents(client)
+    # DiscordComponents(client)
+
+@tasks.loop(seconds=3)
+async def change_status():
+  await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
 
 @client.event
 async def on_message(message):
@@ -118,5 +125,5 @@ async def on_voice_state_update(member, before, after):
         await channel.send("Goodbye! 👋 ⏏️")
         await voice_state.disconnect()
 
-
-client.run(TOKEN)
+keep_alive.keep_alive()
+client.run(my_secret)

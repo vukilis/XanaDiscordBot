@@ -1,14 +1,16 @@
+import os
 import discord
 from discord.ext import commands
-from discord.utils import get
+# from discord.utils import get
 import requests
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 import urllib.request
 import time, json, pprint, os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
-TOKEN = os.getenv('TRACKER_CSGO_TOKEN')
+# load_dotenv()
+# TOKEN = os.getenv('TRACKER_CSGO_TOKEN')
+my_secret = os.environ['TRACKER_CSGO_TOKEN']
 
 class CSGO(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -21,7 +23,7 @@ class CSGO(commands.Cog):
         try:
             url = 'https://public-api.tracker.gg/v2/csgo/standard/profile/steam/'+username
             session = requests.Session()
-            response = session.get(url, headers={'TRN-Api-Key':TOKEN,'User-Agent': 'Mozilla/5.0', 'Content-Type' : 'application/json'})
+            response = session.get(url, headers={'TRN-Api-Key':my_secret,'User-Agent': 'Mozilla/5.0', 'Content-Type' : 'application/json'})
             data = json.loads(response.text) 
             # pprint.pprint(data)
             player_name =  data['data']['platformInfo']['platformUserHandle']

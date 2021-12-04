@@ -1,6 +1,6 @@
 import asyncio
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import youtube_dl
 import voice
 from discord.utils import get
@@ -101,7 +101,7 @@ class Music(commands.Cog):
             if voice_channel and not voice_ch.is_playing():
                 info = ydl.extract_info(url, download=False)
                 url2 = info['formats'][0]['url']
-                voice_ch.play(discord.FFmpegPCMAudio(executable="V:/Program Files (x86)/JDownloader/tools/Windows/ffmpeg/x64/ffmpeg.exe", source=url2, **FFMPEG_OPTIONS))
+                voice_ch.play(discord.FFmpegPCMAudio(executable="ffmpeg/ffmpeg", source=url2, **FFMPEG_OPTIONS))
                 if 'entries' in info:
                     video = info['entries'][0]       
                 else:
