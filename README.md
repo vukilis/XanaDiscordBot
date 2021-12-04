@@ -7,6 +7,10 @@
 3. Discord Bot Token
 4. TRACKER_CSGO_TOKEN
 
+## Services
+* [replit.com](https://replit.com/)
+* [UptimeRobot](https://uptimerobot.com/) - 24/7
+
 ## How to use
 Use the [git](https://git-scm.com/) to download XanaDiscordBot.
 
