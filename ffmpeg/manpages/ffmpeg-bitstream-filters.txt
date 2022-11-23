@@ -83,7 +83,7 @@ BITSTREAM FILTERS
 	       Top-left position.
 
        tick_rate
-	   Set the tick rate (num_units_in_display_tick / time_scale) in the
+	   Set the tick rate (time_scale / num_units_in_display_tick) in the
 	   timing info in the sequence header.
 
        num_ticks_per_picture
@@ -125,6 +125,35 @@ BITSTREAM FILTERS
        extradata to the key packets:
 
 	       ffmpeg -i INPUT -map 0 -flags:v +global_header -c:v libx264 -bsf:v dump_extra out.ts
+
+   dv_error_marker
+       Blocks in DV which are marked as damaged are replaced by blocks of the
+       specified color.
+
+       color
+	   The color to replace damaged blocks by
+
+       sta A 16 bit mask which specifies which of the 16 possible error status
+	   values are to be replaced by colored blocks. 0xFFFE is the default
+	   which replaces all non 0 error status values.
+
+	   ok  No error, no concealment
+
+	   err Error, No concealment
+
+	   res Reserved
+
+	   notok
+	       Error or concealment
+
+	   notres
+	       Not reserved
+
+	   Aa, Ba, Ca, Ab, Bb, Cb, A, B, C, a, b, erri, erru
+	       The specific error status code
+
+	   see page 44-46 or section 5.5 of
+	   <http://web.archive.org/web/20060927044735/http://www.smpte.org/smpte_store/standards/pdf/s314m.pdf>
 
    eac3_core
        Extract the core from a E-AC-3 stream, dropping extra channels.
@@ -192,10 +221,15 @@ BITSTREAM FILTERS
 
        aud Insert or remove AUD NAL units in all access units of the stream.
 
+	   pass
 	   insert
 	   remove
+
+	   Default is pass.
+
        sample_aspect_ratio
 	   Set the sample aspect ratio of the stream in the VUI parameters.
+	   See H.264 table E-1.
 
        overscan_appropriate_flag
 	   Set whether the stream is suitable for display using overscan or
@@ -217,7 +251,7 @@ BITSTREAM FILTERS
 	   E.2.1 and figure E-1).
 
        tick_rate
-	   Set the tick rate (num_units_in_tick / time_scale) in the VUI
+	   Set the tick rate (time_scale / num_units_in_tick) in the VUI
 	   parameters.	This is the smallest time unit representable in the
 	   stream, and in many cases represents the field rate of the stream
 	   (double the frame rate).
@@ -227,6 +261,12 @@ BITSTREAM FILTERS
 	   indicates that the framerate is exactly half the tick rate, but the
 	   exact meaning is dependent on interlacing and the picture structure
 	   (see H.264 section E.2.1 and table E-6).
+
+       zero_new_constraint_set_flags
+	   Zero constraint_set4_flag and constraint_set5_flag in the SPS.
+	   These bits were reserved in a previous version of the H.264 spec,
+	   and thus some hardware decoders require these to be zero. The
+	   result of zeroing this is still a valid bitstream.
 
        crop_left
        crop_right
@@ -249,6 +289,34 @@ BITSTREAM FILTERS
 
        delete_filler
 	   Deletes both filler NAL units and filler SEI messages.
+
+       display_orientation
+	   Insert, extract or remove Display orientation SEI messages.	See
+	   H.264 section D.1.27 and D.2.27 for syntax and semantics.
+
+	   pass
+	   insert
+	   remove
+	   extract
+
+	   Default is pass.
+
+	   Insert mode works in conjunction with "rotate" and "flip" options.
+	   Any pre-existing Display orientation messages will be removed in
+	   insert or remove mode.  Extract mode attaches the display matrix to
+	   the packet as side data.
+
+       rotate
+	   Set rotation in display orientation SEI (anticlockwise angle in
+	   degrees).  Range is -360 to +360. Default is NaN.
+
+       flip
+	   Set flip in display orientation SEI.
+
+	   horizontal
+	   vertical
+
+	   Default is unset.
 
        level
 	   Set the level in the SPS.  Refer to H.264 section A.3 and tables
@@ -309,10 +377,10 @@ BITSTREAM FILTERS
 	   E.3.1 and figure E.1).
 
        tick_rate
-	   Set the tick rate in the VPS and VUI parameters (num_units_in_tick
-	   / time_scale).  Combined with num_ticks_poc_diff_one, this can set
-	   a constant framerate in the stream.	Note that it is likely to be
-	   overridden by container parameters when the stream is in a
+	   Set the tick rate in the VPS and VUI parameters (time_scale /
+	   num_units_in_tick). Combined with num_ticks_poc_diff_one, this can
+	   set a constant framerate in the stream.  Note that it is likely to
+	   be overridden by container parameters when the stream is in a
 	   container.
 
        num_ticks_poc_diff_one
@@ -466,21 +534,77 @@ BITSTREAM FILTERS
        Parameters:
 
        amount
-	   A numeral string, whose value is related to how often output bytes
-	   will be modified. Therefore, values below or equal to 0 are
-	   forbidden, and the lower the more frequent bytes will be modified,
-	   with 1 meaning every byte is modified.
+	   Accepts an expression whose evaluation per-packet determines how
+	   often bytes in that packet will be modified. A value below 0 will
+	   result in a variable frequency.  Default is 0 which results in no
+	   modification. However, if neither amount nor drop is specified,
+	   amount will be set to -1. See below for accepted variables.
+
+       drop
+	   Accepts an expression evaluated per-packet whose value determines
+	   whether that packet is dropped.  Evaluation to a positive value
+	   results in the packet being dropped. Evaluation to a negative value
+	   results in a variable chance of it being dropped, roughly inverse
+	   in proportion to the magnitude of the value. Default is 0 which
+	   results in no drops. See below for accepted variables.
 
        dropamount
-	   A numeral string, whose value is related to how often packets will
-	   be dropped.	Therefore, values below or equal to 0 are forbidden,
-	   and the lower the more frequent packets will be dropped, with 1
-	   meaning every packet is dropped.
+	   Accepts a non-negative integer, which assigns a variable chance of
+	   it being dropped, roughly inverse in proportion to the value.
+	   Default is 0 which results in no drops. This option is kept for
+	   backwards compatibility and is equivalent to setting drop to a
+	   negative value with the same magnitude i.e. "dropamount=4" is the
+	   same as "drop=-4". Ignored if drop is also specified.
 
-       The following example applies the modification to every byte but does
-       not drop any packets.
+       Both "amount" and "drop" accept expressions containing the following
+       variables:
 
-	       ffmpeg -i INPUT -c copy -bsf noise[=1] output.mkv
+       n   The index of the packet, starting from zero.
+
+       tb  The timebase for packet timestamps.
+
+       pts Packet presentation timestamp.
+
+       dts Packet decoding timestamp.
+
+       nopts
+	   Constant representing AV_NOPTS_VALUE.
+
+       startpts
+	   First non-AV_NOPTS_VALUE PTS seen in the stream.
+
+       startdts
+	   First non-AV_NOPTS_VALUE DTS seen in the stream.
+
+       duration
+       d   Packet duration, in timebase units.
+
+       pos Packet position in input; may be -1 when unknown or not set.
+
+       size
+	   Packet size, in bytes.
+
+       key Whether packet is marked as a keyframe.
+
+       state
+	   A pseudo random integer, primarily derived from the content of
+	   packet payload.
+
+       Examples
+
+       Apply modification to every byte but don't drop any packets.
+
+	       ffmpeg -i INPUT -c copy -bsf noise=1 output.mkv
+
+       Drop every video packet not marked as a keyframe after timestamp 30s
+       but do not modify any of the remaining packets.
+
+	       ffmpeg -i INPUT -c copy -bsf:v noise=drop='gt(t\,30)*not(key)' output.mkv
+
+       Drop one second of audio every 10 seconds and add some random noise to
+       the rest.
+
+	       ffmpeg -i INPUT -c copy -bsf:a noise=amount=-1:drop='between(mod(t\,10)\,9\,10)' output.mkv
 
    null
        This bitstream filter passes the packets through unchanged.
@@ -513,6 +637,13 @@ BITSTREAM FILTERS
        48kHz audio for NTSC frame rate using the frame_rate option.
 
 	       ffmpeg -f lavfi -i sine=r=48000:d=1 -c pcm_s16le -bsf pcm_rechunk=r=30000/1001 -f framecrc -
+
+   pgs_frame_merge
+       Merge a sequence of PGS Subtitle segments ending with an "end of
+       display set" segment into a single packet.
+
+       This is required by some containers that support PGS subtitles (muxer
+       "matroska").
 
    prores_metadata
        Modify color property metadata embedded in prores stream.
@@ -600,6 +731,12 @@ BITSTREAM FILTERS
        pts
        dts Set expressions for PTS, DTS or both.
 
+       duration
+	   Set expression for duration.
+
+       time_base
+	   Set output time base.
+
        The expressions are evaluated through the eval API and can contain the
        following constants:
 
@@ -615,6 +752,9 @@ BITSTREAM FILTERS
 
        PTS The presentation timestamp in input.
 
+       DURATION
+	   The duration in input.
+
        STARTDTS
 	   The DTS of the first packet.
 
@@ -627,15 +767,36 @@ BITSTREAM FILTERS
        PREV_INPTS
 	   The previous input PTS.
 
+       PREV_INDURATION
+	   The previous input duration.
+
        PREV_OUTDTS
 	   The previous output DTS.
 
        PREV_OUTPTS
 	   The previous output PTS.
 
+       PREV_OUTDURATION
+	   The previous output duration.
+
+       NEXT_DTS
+	   The next input DTS.
+
+       NEXT_PTS
+	   The next input PTS.
+
+       NEXT_DURATION
+	   The next input duration.
+
        TB  The timebase of stream packet belongs.
 
+       TB_OUT
+	   The output timebase.
+
        SR  The sample rate of stream packet belongs.
+
+       NOPTS
+	   The AV_NOPTS_VALUE constant.
 
    text2movsub
        Convert text subtitles to MOV subtitles (as used by the "mov_text"

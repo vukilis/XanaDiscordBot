@@ -1,3 +1,4 @@
 *.env
 __pycache__/
+.pytest_cache/
 .nije_zavrseno.txt

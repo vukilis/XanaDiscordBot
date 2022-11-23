@@ -4,7 +4,7 @@ NAME
        ffprobe - ffprobe media prober
 
 SYNOPSIS
-       ffprobe [options] [input_url]
+       ffprobe [options] input_url
 
 DESCRIPTION
        ffprobe gathers information from multimedia streams and prints it in
@@ -17,6 +17,9 @@ DESCRIPTION
        If a url is specified in input, ffprobe will try to open and probe the
        url content. If the url cannot be opened or recognized as a multimedia
        file, a positive exit code is returned.
+
+       If no output is specified as output with o ffprobe will write to
+       stdout.
 
        ffprobe may be employed both as a standalone application or in
        combination with a textual filter, which may perform more sophisticated
@@ -215,6 +218,9 @@ OPTIONS
        -layouts
 	   Show channel names and standard channel layouts.
 
+       -dispositions
+	   Show stream dispositions.
+
        -colors
 	   Show recognized color names.
 
@@ -394,6 +400,12 @@ OPTIONS
 	       athlon
 	       athlonxp
 	       k8
+       -cpucount count (global)
+	   Override detection of CPU count. This option is intended for
+	   testing. Do not use it unless you know what you're doing.
+
+		   ffmpeg -cpucount 2
+
        -max_alloc bytes
 	   Set the maximum size limit for allocating a block on the heap by
 	   ffmpeg's family of malloc functions. Exercise extreme caution when
@@ -699,12 +711,22 @@ OPTIONS
 	   Pixel format information for each format is printed within a
 	   section with name "PIXEL_FORMAT".
 
+       -show_optional_fields value
+	   Some writers viz. JSON and XML, omit the printing of fields with
+	   invalid or non-applicable values, while other writers always print
+	   them. This option enables one to control this behaviour.  Valid
+	   values are "always"/1, "never"/0 and "auto"/"-1".  Default is auto.
+
        -bitexact
 	   Force bitexact output, useful to produce output which is not
 	   dependent on the specific build.
 
        -i input_url
 	   Read input_url.
+
+       -o output_url
+	   Write output to output_url. If not specified, the output is sent to
+	   stdout.
 
 WRITERS
        A writer defines the output format adopted by ffprobe, and will be used

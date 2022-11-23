@@ -316,8 +316,22 @@ INPUT DEVICES
 	   Defaults to 2.
 
        duplex_mode
-	   Sets the decklink device duplex mode. Must be unset, half or full.
-	   Defaults to unset.
+	   Sets the decklink device duplex/profile mode. Must be unset, half,
+	   full, one_sub_device_full, one_sub_device_half,
+	   two_sub_device_full, four_sub_device_half Defaults to unset.
+
+	   Note: DeckLink SDK 11.0 have replaced the duplex property by a
+	   profile property.  For the DeckLink Duo 2 and DeckLink Quad 2, a
+	   profile is shared between any 2 sub-devices that utilize the same
+	   connectors. For the DeckLink 8K Pro, a profile is shared between
+	   all 4 sub-devices. So DeckLink 8K Pro support four profiles.
+
+	   Valid profile modes for DeckLink 8K Pro(with DeckLink SDK >= 11.0):
+	   one_sub_device_full, one_sub_device_half, two_sub_device_full,
+	   four_sub_device_half
+
+	   Valid profile modes for DeckLink Quad 2 and DeckLink Duo 2: half,
+	   full
 
        timecode_format
 	   Timecode type to include in the frame and video stream metadata.
@@ -551,6 +565,12 @@ INPUT DEVICES
 	   Save the currently used video capture filter device and its
 	   parameters (if the filter supports it) to a file.  If a file with
 	   the same name exists it will be overwritten.
+
+       use_video_device_timestamps
+	   If set to false, the timestamp for video frames will be derived
+	   from the wallclock instead of the timestamp provided by the capture
+	   device. This allows working around devices that provide unreliable
+	   timestamps.
 
        Examples
 
@@ -1113,12 +1133,12 @@ INPUT DEVICES
 	   Specify the channels in use, by default 2 (stereo) is set.
 
        frame_size
-	   Specify the number of bytes per frame, by default it is set to
-	   1024.
+	   This option does nothing and is deprecated.
 
        fragment_size
-	   Specify the minimal buffering fragment in PulseAudio, it will
-	   affect the audio latency. By default it is unset.
+	   Specify the size in bytes of the minimal buffering fragment in
+	   PulseAudio, it will affect the audio latency. By default it is set
+	   to 50 ms amount of data.
 
        wallclock
 	   Set the initial PTS using the current time. Default is 1.
@@ -1554,12 +1574,38 @@ OUTPUT DEVICES
 	   Amount of time to preroll video in seconds.	Defaults to 0.5.
 
        duplex_mode
-	   Sets the decklink device duplex mode. Must be unset, half or full.
-	   Defaults to unset.
+	   Sets the decklink device duplex/profile mode. Must be unset, half,
+	   full, one_sub_device_full, one_sub_device_half,
+	   two_sub_device_full, four_sub_device_half Defaults to unset.
+
+	   Note: DeckLink SDK 11.0 have replaced the duplex property by a
+	   profile property.  For the DeckLink Duo 2 and DeckLink Quad 2, a
+	   profile is shared between any 2 sub-devices that utilize the same
+	   connectors. For the DeckLink 8K Pro, a profile is shared between
+	   all 4 sub-devices. So DeckLink 8K Pro support four profiles.
+
+	   Valid profile modes for DeckLink 8K Pro(with DeckLink SDK >= 11.0):
+	   one_sub_device_full, one_sub_device_half, two_sub_device_full,
+	   four_sub_device_half
+
+	   Valid profile modes for DeckLink Quad 2 and DeckLink Duo 2: half,
+	   full
 
        timing_offset
 	   Sets the genlock timing pixel offset on the used output.  Defaults
 	   to unset.
+
+       link
+	   Sets the SDI video link configuration on the used output. Must be
+	   unset, single link SDI, dual link SDI or quad link SDI.  Defaults
+	   to unset.
+
+       sqd Enable Square Division Quad Split mode for Quad-link SDI output.
+	   Must be unset, true or false.  Defaults to unset.
+
+       level_a
+	   Enable SMPTE Level A mode on the used output.  Must be unset, true
+	   or false.  Defaults to unset.
 
        Examples
 
