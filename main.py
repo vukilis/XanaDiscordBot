@@ -1,3 +1,4 @@
+import asyncio # python.py new version
 import os, json
 import discord
 from discord import message
@@ -5,26 +6,27 @@ from discord import message
 from discord.ext import commands, tasks
 import music, rocket_league, steam
 from discord.utils import get
-from discord_components import *
+from discord import *
 from datetime import datetime
 import keep_alive
 
 # load_dotenv()
 # TOKEN = os.getenv('DISCORD_TOKEN')
-my_secret = os.environ['DISCORD_TOKEN']
+my_secret = 'OTEzNzQ5Nzc3MDc2ODU4ODkw.YaDByw.kwEUa3Atl0s2fM_LlZMI0grugvs'
 
 cogs = [music, rocket_league, steam]
 client = commands.Bot(command_prefix='!', owner_id = 269115882251223052, intents = discord.Intents.all())
 client.launch_time = datetime.utcnow()
 
-for i in range(len(cogs)):
-    cogs[i].setup(client)
+async def cogs_func(): # make cogs function
+    for i in range(len(cogs)):
+        await cogs[i].setup(client)
 
 @client.event
 async def on_ready(*args, **kwargs):
     change_status.start()
     print(f'{client.user} has connected to Discord!')
-    channel_id_server = [913861842235953182]
+    channel_id_server = [1130579438862602332] #913861842235953182
     # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
     for i in channel_id_server:
         await client.get_channel(i).send('Xana is awake, say \"!hello\" to Xana')
@@ -32,7 +34,7 @@ async def on_ready(*args, **kwargs):
 
 @tasks.loop(seconds=3)
 async def change_status():
-  await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
 
 @client.event
 async def on_message(message):
@@ -127,4 +129,11 @@ async def on_voice_state_update(member, before, after):
         await voice_state.disconnect()
 
 keep_alive.keep_alive()
-client.run(my_secret)
+# client.run(my_secret) # deprecated
+
+async def main():   # new discord.py update
+    async with client:
+        await cogs_func() # call cogs function
+        await client.start(my_secret)
+
+asyncio.run(main())

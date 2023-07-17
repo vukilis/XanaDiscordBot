@@ -10,7 +10,7 @@ import time, json, pprint, os
 
 # load_dotenv()
 # TOKEN = os.getenv('TRACKER_CSGO_TOKEN')
-my_secret = os.environ['TRACKER_CSGO_TOKEN']
+my_secret = 'c8838964-1aaf-4314-ac55-06f1c50c36a4'
 
 class CSGO(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -69,6 +69,6 @@ class CSGO(commands.Cog):
             else:
                 print('http error',e)
                 
-def setup(client):
-    client.add_cog(CSGO(client))
+async def setup(client):
+    await client.add_cog(CSGO(client))
 

@@ -23,13 +23,14 @@ class Music(commands.Cog):
         self.bot = bot 
         self.song_queue = {}
         
-    @commands.command()
+    @commands.command(name='join')
     async def join(self, ctx):
         """!join | Join to voice"""
         if ctx.author.voice is None:
             e = discord.Embed(title="⚠️ Please join in a voice channel! ⚠️", color=discord.Color.green())
             await ctx.send(embed=e)
         voice_channel = ctx.author.voice.channel
+        await voice_channel.connect()
         if ctx.voice_client is None:
             e = discord.Embed(title="🎶 Hello Friend, lets music! 🎶", color=discord.Color.green())
             await ctx.send(embed=e)
@@ -219,5 +220,5 @@ class Music(commands.Cog):
         await ctx.send(link)
 
 
-def setup(client):
-    client.add_cog(Music(client))
+async def setup(client):
+    await client.add_cog(Music(client))

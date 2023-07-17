@@ -127,5 +127,5 @@ class RL(commands.Cog):
             else:
                 print('http error',e)
     
-def setup(client):
-    client.add_cog(RL(client))
+async def setup(client):
+    await client.add_cog(RL(client))
