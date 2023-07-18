@@ -2,7 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands, tasks
 import youtube_dl
-import voice
+# import voice
 from discord.utils import get
 import requests
 from bs4 import BeautifulSoup
@@ -33,6 +33,7 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             e = discord.Embed(title="🎶 Hello Friend, lets music! 🎶", color=discord.Color.green())
             await ctx.send(embed=e)
+            # print(voice_channel)    
             await voice_channel.connect()
         if Music.play(self, ctx):
             await ctx.voice_client.move_to(voice_channel)

@@ -86,7 +86,7 @@ async def on_member_remove(member):
         ).set_footer(
             text=f'{member.name} just left'
         ).set_thumbnail(
-            url = member.avatar_url
+            url = member.avatar.url
         )
     
     await channel.send(embed=embed)
@@ -98,7 +98,7 @@ async def avatar(ctx, member: discord.Member):
     show_avatar = discord.Embed(
         color = discord.Color.dark_blue()
     )
-    show_avatar.set_image(url='{}'.format(member.avatar_url))
+    show_avatar.set_image(url='{}'.format(member.avatar.url))
     await ctx.send(embed=show_avatar)
 
 @client.command()
