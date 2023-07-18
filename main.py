@@ -12,7 +12,7 @@ import keep_alive
 
 # load_dotenv()
 # TOKEN = os.getenv('DISCORD_TOKEN')
-my_secret = 'OTEzNzQ5Nzc3MDc2ODU4ODkw.YaDByw.kwEUa3Atl0s2fM_LlZMI0grugvs'
+my_secret = os.environ['DISCORD_TOKEN']
 
 cogs = [music, rocket_league, steam]
 client = commands.Bot(command_prefix='!', owner_id = 269115882251223052, intents = discord.Intents.all())

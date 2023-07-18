@@ -30,7 +30,6 @@ class Music(commands.Cog):
             e = discord.Embed(title="⚠️ Please join in a voice channel! ⚠️", color=discord.Color.green())
             await ctx.send(embed=e)
         voice_channel = ctx.author.voice.channel
-        await voice_channel.connect()
         if ctx.voice_client is None:
             e = discord.Embed(title="🎶 Hello Friend, lets music! 🎶", color=discord.Color.green())
             await ctx.send(embed=e)
